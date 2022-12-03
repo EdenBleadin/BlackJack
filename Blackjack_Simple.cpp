@@ -1,5 +1,6 @@
 #include <iostream>
 #include <algorithm>
+#include <random>
 #include <vector>
 
 
@@ -9,13 +10,31 @@ std::vector<int> PlayerHand;
 std::vector<int> DealerHand;
 std::vector<int> InPlay;
 int GameOver;
+int Wins;
+int Losses;
+int Ties;
 void print(std::vector<int> Count)
 {
 	for (int y = 0; y < size(Count); y++)
 	{
-		std::cout << Count[y];
-		printf(" ");
-
+		
+		switch (Count[y]) {
+		case 0:
+			printf("A ");
+			break;
+		case 11:
+			printf("J ");
+			break;
+		case 12:
+			printf("Q ");
+			break;
+		case 13:
+			printf("K ");
+			break;
+		default:
+			std::cout << Count[y];
+			printf(" ");
+		}
 	}
 	printf("\n");
 }
@@ -50,7 +69,7 @@ int analyse()
 			}
 			else
 			{
-				for (std::vector<int> e : PotentialHandCount)
+				for (std::vector<int>& e : PotentialHandCount)
 				{
 					std::vector<int> y = e;
 					y.emplace_back(1);
@@ -108,19 +127,27 @@ int analyse()
 	{
 		for (int x : Scores)
 		{
-			return x;
-		}
-	}
-	for (int y = 21; y > 15; y--)
-	{
-		for (int x : Scores)
-		{
-			if (x == y)
+			if (x > 15)
 			{
 				return x;
 			}
+			
 		}
 	}
+	else
+	{
+		for (int y = 21; y > 15; y--)
+		{
+			for (int x : Scores)
+			{
+				if (x == y)
+				{
+					return x;
+				}
+			}
+		}
+	}
+	
 	return -1;
 }
 int dealeranalyse()
@@ -142,7 +169,7 @@ int dealeranalyse()
 			}
 			else
 			{
-				for (std::vector<int> e : PotentialHandCount)
+				for (std::vector<int>& e : PotentialHandCount)
 				{
 					std::vector<int> y = e;
 					y.emplace_back(1);
@@ -217,25 +244,37 @@ int dealeranalyse()
 }
 void lose()
 {
-
+	printf("You overdrew");
+	Losses++;
+	PlayerHand.clear();
+	DealerHand.clear();
+	GameOver = 1;
 }
 void results(int PlayerScore)
 {
+	printf("\n");
+	printf("Dealer hand is:");
+	print(DealerHand);
 	int x = dealeranalyse();
 	if (x == 0)
 	{
 		printf("Dealer overdrew you win");
-
+		Wins++;
 	}
 	else if (PlayerScore > x)
 	{
-		printf("you win");
-
+		printf("You win");
+		Wins++;
 	}
 	else if (PlayerScore == x)
 	{
 		printf("Tie");
-
+		Ties++;
+	}
+	else
+	{
+		printf("Dealer scores higher, you lose");
+		Losses++;
 	}
 	PlayerHand.clear();
 	DealerHand.clear();
@@ -265,6 +304,9 @@ void game()
 			lose();
 			break;
 		default:
+			printf("\n");
+			printf("Stay");
+			printf("\n");
 			results(x);
 			break;
 		}
@@ -279,6 +321,16 @@ int main()
 		game();
 		GameCount++;
 		GameOver = 0;
+		printf("\n");
+		printf("----------------------");
+		printf("\n");
 	}
-	
+	printf("Wins: ");
+	std::cout << Wins;
+	printf("\n");
+	printf("Ties: ");
+	std::cout << Ties;
+	printf("\n");
+	printf("Losses: ");
+	std::cout << Losses;
 }
